@@ -83,8 +83,8 @@ Loop1:
 Loop2:
 ; ============ Add your code below ==============================
 ; solution
-								; Compare i with m (i > n / 2?)
-								; If i > m, the number is prime (branch to True)
+		CMP   R6, R5			; Compare i with m (i > n / 2?)
+		BHI   True				; If i > m, the number is prime (branch to True)
                                 ; Caution: are you checking signed or unsigned numbers?
 
 ; ============= End of your code ================================
@@ -96,15 +96,25 @@ Loop2:
 
 ; ============ Add your code below ==============================
 ; solution
-
+        BEQ False
+        add R6, #1
+        B Loop2
 
 
 
 True
+        MOV R0, #1      ;put 1 into R0
+        STRB R0, [R2]   ; store R0(1) into R2(res array)
+        add R2, #1      ; incriment res array pos
+        B Loop1         ;go back to loop
 
 
 
 False
+        MOV R0, #-1     ;put 1 into R0
+        STRB R0, [R2]   ; store R0(-1) into R2(res array)
+        add R2, #1      ; incriment res array pos
+        B Loop1         ;go back to loop
 
 
 
