@@ -96,9 +96,9 @@ Loop2:
 
 ; ============ Add your code below ==============================
 ; solution
-        BEQ False
-        add R6, #1
-        B Loop2
+        BEQ False               ;branch to false if a factor is found
+        add R6, #1              ;increment i
+        B Loop2                 ;go back to loop2 for more dividing
 
 
 
