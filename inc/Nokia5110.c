@@ -405,7 +405,7 @@ void Nokia5110_OutString(const char* ptr){
     // You must use Nokia5110_OutChar
 
     while(*ptr){
-       Nokia5110_OutChar(*ptr++);
+       Nokia5110_OutChar(*ptr++);   //ptr points to address for char
     }
 }
 
@@ -447,13 +447,13 @@ void Nokia5110_OutUDec(uint32_t n, int min_length){
     // Convert the number into a reversed string.
     int count = Nokia_Num2String(n);
 
-    if(min_length > count){
-        for(int i = 0; i < min_length-count; i++){
-            Nokia5110_OutChar(' ');
+    if(min_length > count){                         //check location of cursor
+        for(int i = 0; i < min_length-count; i++){  //loop till at spot to put numbers
+            Nokia5110_OutChar(' ');                 //fill with spaces
         }
     }
 
-    for(int j = count-1; j >= 0; j--){
+    for(int j = count-1; j >= 0; j--){              //loop to print number string
         Nokia5110_OutChar(Buffer[j]);
     }
 
@@ -471,19 +471,19 @@ void Nokia5110_OutSDec(int32_t n, int min_length){
     int count = Nokia_Num2String(n);
 
     if(n < 0){
-        uint32_t x = -n;
-        count = Nokia_Num2String(x);
+        uint32_t x = -n;                    //cast into unsigned
+        count = Nokia_Num2String(x);        //fix count
 
-        if(min_length > count-1){
+        if(min_length > count-1){           //loop to correct spot, but leave space for '-' in front of number
            for(int i = 0; i < min_length-count-1; i++){
                 Nokia5110_OutChar(' ');
            }
         }
-        Nokia5110_OutChar('-');
-        Nokia5110_OutUDec(x, 0);
+        Nokia5110_OutChar('-');             //put in '-'
+        Nokia5110_OutUDec(x, 0);            //now print unsigned number
     }
     else{
-        uint32_t x = n;
+        uint32_t x = n;                     //is number >0, just print unsigned number
         Nokia5110_OutUDec(x, min_length);
     }
 
