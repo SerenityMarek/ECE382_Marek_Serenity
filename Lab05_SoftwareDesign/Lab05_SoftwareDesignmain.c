@@ -76,7 +76,7 @@ void Program5_1(void) {
 
     // Contrast value 0xB1 looks good on red SparkFun.
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB1;
+    uint8_t const contrast = 0xB2;
     Nokia5110_SetContrast(contrast);
 
     Nokia5110_Clear();
@@ -115,7 +115,7 @@ void Program5_2(void) {
 	
     // Contrast value 0xB1 looks good on red SparkFun.
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB1;
+    uint8_t const contrast = 0xB2;
     Nokia5110_SetContrast(contrast);
 
     LEDOUT = 1;
@@ -208,9 +208,9 @@ void Program5_3(void){
 
 
 void main(void){
-    Program5_1();
+    //Program5_1();
     //Program5_2();
-    //Program5_3();
+    Program5_3();
 
 }
 

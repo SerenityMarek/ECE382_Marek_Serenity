@@ -401,10 +401,12 @@ void Nokia5110_OutChar(char data) {
 // Outputs: none
 // Assumes: LCD is in default horizontal addressing mode (V = 0)
 void Nokia5110_OutString(const char* ptr){
-
     // You write this as part of Lab 5
     // You must use Nokia5110_OutChar
 
+    while(*ptr){
+       Nokia5110_OutChar(*ptr++);
+    }
 }
 
 
@@ -442,9 +444,19 @@ static int Nokia_Num2String(uint32_t n) {
 
 void Nokia5110_OutUDec(uint32_t n, int min_length){
     // Write this as part of Lab 5
-
     // Convert the number into a reversed string.
     int count = Nokia_Num2String(n);
+
+    if(min_length > count){
+        for(int i = 0; i < min_length-count; i++){
+            Nokia5110_OutChar(' ');
+        }
+    }
+
+    for(int j = count-1; j >= 0; j--){
+        Nokia5110_OutChar(Buffer[j]);
+    }
+
 }
 
 
@@ -454,10 +466,26 @@ void Nokia5110_OutSDec(int32_t n, int min_length){
     // assign the magnitude of n to x
     // Ensure the magnitude of -2147483648(0x80000000) is 2147483648(0x80000000).
     // You are not allowed to use the built-in abs() function.
-    uint32_t x = 0;
 
     // Convert the number into a reversed string.
-    int count = Nokia_Num2String(x);
+    int count = Nokia_Num2String(n);
+
+    if(n < 0){
+        uint32_t x = -n;
+        count = Nokia_Num2String(x);
+
+        if(min_length > count-1){
+           for(int i = 0; i < min_length-count-1; i++){
+                Nokia5110_OutChar(' ');
+           }
+        }
+        Nokia5110_OutChar('-');
+        Nokia5110_OutUDec(x, 0);
+    }
+    else{
+        uint32_t x = n;
+        Nokia5110_OutUDec(x, min_length);
+    }
 
 }
 
