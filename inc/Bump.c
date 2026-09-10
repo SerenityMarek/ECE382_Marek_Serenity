@@ -58,10 +58,14 @@ policies, either expressed or implied, of the FreeBSD Project.
 void Bump_Init(void){
     // write this as part of Homework 8
     // 1) configure P4.7-P4.5, P4.3, P4.2, and P4.0 as GPIO
+    P4->SEL0 &= ~0xED;
+    P4->SEL1 &= ~0xED;
     // 2) make P4.7-P4.5, P4.3, P4.2, and P4.0 in
+    P4->DIR &=~0xED;
     // 3) enable pull resistors on P4.7-P4.5, P4.3, P4.2, and P4.0
+    P4->REN |= 0xED;
     //    P4.7-P4.5, P4.3, P4.2, and P4.0 are pull-up
-  
+    P4->OUT |= 0xED;
 }
 
 
@@ -76,8 +80,19 @@ void Bump_Init(void){
 uint8_t Bump_Read(void) {
     // write this as part of Lab 8
     // 1)read the sensors (which are active low) and convert to active high
+    uint8_t pinRead = ~P4->IN;
 
     // 2. Select, shift, combine, and output
-    return 0; // replace this line
+    uint8_t output = 0x00;
+
+    output |= ((pinRead & 0xE0) >> 2);
+    output |= ((pinRead & 0x0C) >> 1);
+    output |= (pinRead & 0x01);
+
+;
+
+
+
+    return output; // replace this line
 }
 
