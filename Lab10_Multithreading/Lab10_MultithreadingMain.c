@@ -97,6 +97,22 @@ void Flash(void) {
 
     // Use Time_1ms to keep the LED light RED for 5 ms and BLUE for 5 ms.
 
+    if(Time_1ms == 0){
+        LaunchPad_RGB(RED);         // Red LED on
+        //Clock_Delay1us(5000);         //delay 5 msc
+    }
+    else if(Time_1ms == 5){
+        LaunchPad_RGB(BLUE);        // Blue LED on
+        //Clock_Delay1us(5000);       //delay 5 ms
+    }
+
+    //Time_1ms = Time_1ms + 5;
+    Time_1ms++;
+
+    if(Time_1ms == 10){         // roll-over
+        Time_1ms = 0;
+    }
+
 
 
 
@@ -118,7 +134,7 @@ void Program10_2(void){
 
     // Contrast value 0xB1 looks good on red SparkFun
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB1;
+    uint8_t const contrast = 0xA9;
     Nokia5110_SetContrast(contrast);
 
     Nokia5110_Clear();
@@ -187,7 +203,7 @@ void Program10_3(void){
 
     // Contrast value 0xB1 looks good on red SparkFun
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB1;
+    uint8_t const contrast = 0xA8;
     Nokia5110_SetContrast(contrast);
 
     Nokia5110_Clear();
@@ -198,19 +214,23 @@ void Program10_3(void){
     // Initialize TimerA2 to run every 1 ms
     uint16_t const period_4us = 250;              // T = 250 * 4us = 1ms
     TimerA2_Init(&TimerTask, period_4us);
+//    TimerA2_Init(&Increment, period_4us);       // f = 1 kHz -- execute Increment in background every 1ms
 
     LaunchPad_RGB(MAGENTA);
     uint16_t count;
 
-    //EnableInterrupts();     // uncomment for background thread
+    EnableInterrupts();     // uncomment for background thread
 
     for (int i = 0; i < 1000; i++) {
+        uint32_t sr = StartCritical();
         count = Increment();        // uncomment for foreground thread
+        EndCritical(sr);
         Clock_Delay1us(1000);
     }
 
     Clock_Delay1ms(1);
-    count = Increment();
+    count = Increment();// --- This is supposed to happen in background
+
     Nokia5110_SetCursor2(2,7); Nokia5110_OutUDec(count, 5);
 
     LaunchPad_RGB(CYAN);
@@ -224,8 +244,8 @@ void Program10_3(void){
 
 void main(void) {
 
-    // Program10_1();
-    // Program10_2();
+    //Program10_1();
+    //Program10_2();
     Program10_3();
 
 }
