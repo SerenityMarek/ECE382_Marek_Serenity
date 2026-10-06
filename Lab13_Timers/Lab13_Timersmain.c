@@ -200,11 +200,27 @@ static uint16_t Timer_10ms = 0;
 void MotorController(void){
 
 
-    uint16_t leftDuty_permil = 0; //0 %
-    uint16_t rightDuty_permil = 0; //0 %
+    uint16_t leftDuty_permil = 100;   //10 %
+    uint16_t rightDuty_permil = 100;  //10 %
 
 	// Write this for Lab 13
+    if (0 == Timer_10ms) {
+        Motor_Forward(leftDuty_permil, rightDuty_permil);
+    } else if (200 == Timer_10ms) {
+        Motor_Coast();
+    } else if (400 == Timer_10ms) {
+        Motor_Backward(leftDuty_permil, rightDuty_permil);
+    } else if (600 == Timer_10ms) {
+        Motor_TurnLeft(leftDuty_permil, rightDuty_permil);
+    } else if (800 == Timer_10ms) {
+        Motor_TurnRight(leftDuty_permil, rightDuty_permil);
+    }
 
+    Timer_10ms++;
+
+    if(Timer_10ms > 800){         // roll-over
+        Timer_10ms = 0;
+    }
 
 }
 
@@ -225,7 +241,7 @@ void Program13_3(void) {
 
     // Contrast value 0xB1 looks good on red SparkFun
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB1;
+    uint8_t const contrast = 0xA9;
     Nokia5110_SetContrast(contrast);
 
     Nokia5110_Clear();
@@ -236,13 +252,14 @@ void Program13_3(void) {
 	// Write this for Lab 13
 
     // Initialize Timer A1 to run MotorController at 100 Hz
-	// const uint16_t period_2us =      ; // T = 5,000 * 2us = 10ms --> 100 Hz
-	// TimerA1_Init(/*pass a function pointer here*/, period_2us);  // 100 Hz
+	const uint16_t period_2us = 5000     ; // T = 5,000 * 2us = 10ms --> 100 Hz
+	TimerA1_Init(&MotorController, period_2us);  // 100 Hz
 
     // Enable Interrupts
     EnableInterrupts();
 
     while(1) {
+        uint32_t sr = StartCritical();
 
         if (0 == Timer_10ms) {
             Nokia5110_SetCursor2(3,7); Nokia5110_OutString("FRWD ");
@@ -256,11 +273,14 @@ void Program13_3(void) {
             Nokia5110_SetCursor2(3,7); Nokia5110_OutString("RIGHT");
         }
 
+        EndCritical(sr);
+
     }
 
 }
+
 int main(void){
-	Program13_1();
+	//Program13_1();
 	//Program13_2();
-	//Program13_3();
+	Program13_3();
 }

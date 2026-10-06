@@ -58,9 +58,9 @@ policies, either expressed or implied, of the FreeBSD Project.
 // Left motor direction (PH) connected to P5.4 (J3.29)
 // Left motor PWM (EN) connected to P2.7/TA0CCP4 (J4.40)
 // Left motor sleep (nSleep) connected to P3.7 (J4.31)
-// Right motor direction (PH) connected to P5.5 (J3.30)
-// Right motor PWM (EN) connected to P2.6/TA0CCP3 (J4.39)
-// Right motor sleep (nSleep) connected to P3.6 (J2.11)
+// Right motor direction (PH) connected to P5.5 (J3.30)       PH --> P5 -> OUT = 0x30
+// Right motor PWM (EN) connected to P2.6/TA0CCP3 (J4.39)     EN --> P2 -> OUT = 0xC0
+// Right motor sleep (nSleep) connected to P3.6 (J2.11)   nSleep --> P3 -> OUT = 0xC0
 
 // ------------Motor_Init------------
 // Initialize GPIO pins for output, which will be used to control
@@ -73,12 +73,22 @@ policies, either expressed or implied, of the FreeBSD Project.
 // Output: none
 void Motor_Init(void){
     // write this as part of Lab 13
+    uint16_t period = 15000;
 
     // configure P5.4 and P5.5 for PH
+    P5 -> SEL0 &= ~0x30;
+    P5 -> SEL1 &= ~0x30;
+    P5 -> DIR |= 0x30;
+    P5 -> OUT &= ~0x30;
 
     // configure P3.6 and P3.7 for SLEEP
+    P3 -> SEL0 &= ~0xC0;
+    P3 -> SEL1 &= ~0xC0;
+    P3 -> DIR |= 0xC0;
+    P3 -> OUT &= ~0xC0;
 
     // initialize PWM with 0% duty cycle
+    PWM_Init34(period, 0, 0);
 
 }
 
@@ -92,20 +102,14 @@ void Motor_Init(void){
 void Motor_Coast(void){
     // write this as part of Lab 13
     // Note: setting nSleep = 0 and PWM (EN) = 0 makes the robot "coast"
+    P3 -> OUT &= ~0xC0;
+    P2 -> OUT &= ~0xC0;
 
     // Update left PWM to 0
-
+    PWM_DutyLeft(0);
     // Update right PWM to 0
-
+    PWM_DutyRight(0);
 			   
-																		
-									
-
-									 
-					 
-									
-					
-
 }
 
 
@@ -117,11 +121,13 @@ void Motor_Coast(void){
 void Motor_Brake(void){
     // write this as part of Lab 13
     // Note: setting nSleep = 1 and PWM (EN) = 0 makes the robot "brake"
+    P3 -> OUT |= 0xC0;
+    P2 -> OUT &= ~0xC0;
 
     // Update left PWM to stop motor
-
+    PWM_DutyLeft(0);
     // Update right PWM to stop motor
-
+    PWM_DutyRight(0);
 }
 
 
@@ -159,11 +165,15 @@ void Motor_Forward(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
     // write this as part of Lab 13
 
     // set direction of motors
+    P3 -> OUT |= 0xC0;  // nSleep = 1
+    P5 -> OUT &= ~0x30; // PH = 0
+    P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
+    PWM_DutyLeft(leftDuty_permil);
+    PWM_DutyRight(rightDuty_permil);
 
     // Activate motors
-
     // FYI: The motors run until software issues another command (don't turn off)
 
 }
@@ -180,8 +190,14 @@ void Motor_TurnRight(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
 
     // write this as part of Lab 13
     // set direction of motors
+    P3 -> OUT |= 0xC0;  // nSleep = 1
+    P5 -> OUT &= ~0x10; // PH4 = 0
+    P5 -> OUT |= 0x20;  //PH5 = 1
+    P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
+    PWM_DutyLeft(leftDuty_permil);
+    PWM_DutyRight(rightDuty_permil);
 
     // Activate motors
     // FYI: The motors run until software issues another command (don't turn off)
@@ -199,9 +215,15 @@ void Motor_TurnRight(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
 void Motor_TurnLeft(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
 
     // Write this as part of Lab 13
-    // Set direction of motors
+    // set direction of motors
+    P3 -> OUT |= 0xC0;  // nSleep = 1
+    P5 -> OUT |= 0x10;  // PH4 = 1
+    P5 -> OUT &= ~0x20; //PH5 = 0
+    P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
+    PWM_DutyLeft(leftDuty_permil);
+    PWM_DutyRight(rightDuty_permil);
 
     // Activate motors
 
@@ -222,8 +244,13 @@ void Motor_Backward(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
 
     // write this as part of Lab 13
     // set direction of motors
+    P3 -> OUT |= 0xC0;  // nSleep = 1
+    P5 -> OUT |= 0x30; // PH = 1
+    P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
+    PWM_DutyLeft(leftDuty_permil);
+    PWM_DutyRight(rightDuty_permil);
 
     // Activate motors
 

@@ -55,25 +55,25 @@ policies, either expressed or implied, of the FreeBSD Project.
 // TimerA0 period: T_TA0 = T_c_TA0 * CCR0 = CCR0 * 2/3 us.
 // PWM period: T_PWM = T_TA0 * 2 = CCR0 * 4/3 us.
 // Duty cycle for P2.6: duty_right/period, for P2.7: duty_left/period
-void PWM_Init34(uint16_t period){
+void PWM_Init34(uint16_t period, uint16_t duty_right, uint16_t duty_left){
 
     // write this as part of Lab 13
-    // Initialize P2.7 and P2.6 - EN PWML/PWMR
+    // Initialize P2.7 and P2.6 - EN PWML/PWMR - 0b1100 0000 -> 0xC0
 
-    /*
-    P2->SEL0
-    P2->SEL1
-    P2->DIR
-    TIMER_A0->CCTL[0] =			// CCI0 toggle
-    TIMER_A0->CCR[0] =			// T_PWM is CCR0*4/3 us, if CCR0 = 15000, T_PWM = 20 ms.
-    TIMER_A0->EX0 =				// divide by 1
-    TIMER_A0->CCTL[3] =			// CCR3 toggle/reset
-    TIMER_A0->CCR[3] =			// CCR3 duty cycle is duty1/period
-    TIMER_A0->CCTL[4] =			// CCR4 toggle/reset
-    TIMER_A0->CCR[4] =			// CCR4 duty cycle is duty2/period
-    TIMER_A0->CTL =				// SMCLK=12MHz, divide by 8, up-down mode
-    */
-    
+
+    P2->SEL0 &= ~0xC0;
+    P2->SEL1 &= ~0xC0;
+    P2->DIR |= 0xC0;
+    TIMER_A0->CCTL[0] =	0x0080;		// CCI0 toggle
+    TIMER_A0->CCR[0] = period;			// T_PWM is CCR0*4/3 us, if CCR0 = 15000, T_PWM = 20 ms.
+    TIMER_A0->EX0 =	0x0000;			// divide by 1
+    TIMER_A0->CCTL[3] =	0x0040;		// CCR3 toggle/reset
+    TIMER_A0->CCR[3] = duty_right;			// CCR3 duty cycle is duty1/period
+    TIMER_A0->CCTL[4] =	0x0040;		// CCR4 toggle/reset
+    TIMER_A0->CCR[4] = duty_left;		// CCR4 duCaty cycle is duty2/period
+    TIMER_A0->CTL =	0x02F0;			// SMCLK=12MHz, divide by 8, up-down mode
+
+
 }
 
 
@@ -92,9 +92,11 @@ void PWM_DutyRight(uint16_t duty_permil){
     // write this as part of Lab 13
 
     // if new duty cycle is greater than period, return immediately
-
+    if(duty >= 15000){
+        return 1;
+     }
     // assign new duty cycle to CCR[3]
-
+    TIMER_A0 -> CCR[3] = duty;
 
 }
 
@@ -114,7 +116,10 @@ void PWM_DutyLeft(uint16_t duty_permil){
     // write this as part of Lab 13
 
     // if new duty cycle is greater than period, return immediately
+    if(duty >= 15000){
+        return 1;
+    }
 
     // assign new duty cycle to CCR[4]
-
+    TIMER_A0 -> CCR[4] = duty;
 }

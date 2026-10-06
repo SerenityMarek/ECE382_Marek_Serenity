@@ -67,7 +67,7 @@ policies, either expressed or implied, of the FreeBSD Project.
  * @param    period is the PWM period in 1.333µs units
  * @brief    PWM initialization
  */
-void PWM_Init34(uint16_t period);
+void PWM_Init34(uint16_t period, uint16_t duty_right, uint16_t duty_left);
 
 
 /**
