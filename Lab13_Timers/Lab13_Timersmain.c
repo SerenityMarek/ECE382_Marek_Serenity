@@ -200,8 +200,8 @@ static uint16_t Timer_10ms = 0;
 void MotorController(void){
 
 
-    uint16_t leftDuty_permil = 100;   //10 %
-    uint16_t rightDuty_permil = 100;  //10 %
+    uint16_t leftDuty_permil = 300;   //10 %
+    uint16_t rightDuty_permil = 300;  //10 %
 
 	// Write this for Lab 13
     if (0 == Timer_10ms) {
@@ -218,7 +218,7 @@ void MotorController(void){
 
     Timer_10ms++;
 
-    if(Timer_10ms > 800){         // roll-over
+    if(Timer_10ms > 1000){         // roll-over
         Timer_10ms = 0;
     }
 
@@ -259,7 +259,7 @@ void Program13_3(void) {
     EnableInterrupts();
 
     while(1) {
-        uint32_t sr = StartCritical();
+        //uint32_t sr = StartCritical();
 
         if (0 == Timer_10ms) {
             Nokia5110_SetCursor2(3,7); Nokia5110_OutString("FRWD ");
@@ -273,7 +273,7 @@ void Program13_3(void) {
             Nokia5110_SetCursor2(3,7); Nokia5110_OutString("RIGHT");
         }
 
-        EndCritical(sr);
+        //EndCritical(sr);
 
     }
 

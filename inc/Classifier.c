@@ -49,12 +49,12 @@
 
 
 // Complete the following lines
-//#define SIDEMAX     // largest side distance to wall in mm
-//#define SIDEMIN     // smallest side distance to wall in mm
-//#define CENTEROPEN  // distance to wall between open/blocked
-//#define CENTERMIN   // min distance to wall in the front
-//#define IRMIN       // min possible reading of IR sensor
-//#define IRMAX       // max possible reading of IR sensor
+#define SIDEMIN    212   // smallest side distance to the wall in mm
+#define SIDEMAX    354   // largest side distance to wall in mm
+#define CENTERMIN  150   // min distance to the wall in the front
+#define CENTEROPEN 600   // distance to the wall between open/blocked
+#define IRMIN      50    // min possible reading of IR sensor
+#define IRMAX      800   // max possible reading of IR sensor
 
 
 /* Classify
@@ -76,7 +76,54 @@ scenario_t Classify(int32_t left_mm, int32_t center_mm, int32_t right_mm) {
     scenario_t result = ClassificationError;
 
     // Add your your code here
+    //class error
+    if(left_mm < IRMIN | center_mm < IRMIN | right_mm < IRMIN |
 
+            left_mm > IRMAX | center_mm > IRMAX | right_mm > IRMAX){
+
+        return ClassificationError;
+    }
+
+
+    //too close
+    uint16_t class = 0;
+    if(left_mm < SIDEMIN) class += LeftTooClose;
+    if(right_mm < SIDEMIN) class += RightTooClose;
+    if(center_mm < CENTERMIN) class += CenterTooClose;
+
+    if(class > 0){
+        switch (class) {
+            case 1:
+                return LeftTooClose;
+            case 2:
+                return RightTooClose;
+            case 3:                     // this shouldn't happen
+                return SidesTooClose;
+            case 4:
+                return CenterTooClose;
+            case 5:
+                return CenterLeftTooClose;
+            case 6:
+                return CenterRightTooClose;
+            default:
+                return AllTooClose;
+        }
+    }
+
+
+    //blocked, right turn, left turn, tee joint
+    if(center_mm < CENTEROPEN){
+        if(left_mm < SIDEMAX & right_mm < SIDEMAX) return Blocked;
+        if(left_mm >= SIDEMAX & right_mm < SIDEMAX) return LeftTurn;
+        if(left_mm < SIDEMAX & right_mm >= SIDEMAX) return RightTurn;
+        if(left_mm >= SIDEMAX & right_mm >= SIDEMAX) return TeeJoint;
+    } //straight, right joint, left joint, crossroad
+    if(center_mm >= CENTEROPEN){
+        if(left_mm < SIDEMAX & right_mm < SIDEMAX) return Straight;
+        if(left_mm < SIDEMAX & right_mm >= SIDEMAX) return RightJoint;
+        if(left_mm >= SIDEMAX & right_mm < SIDEMAX) return LeftJoint;
+        if(left_mm >= SIDEMAX & right_mm >= SIDEMAX) return CrossRoad;
+    }
 
     return result;
 }

@@ -96,7 +96,7 @@ void TimerA1_Init(void(*task)(void), uint16_t period_2us){
 
     // interrupts enabled in the main program after all devices initialized
     // priority 2
-    NVIC->IP[9] = 0x40;
+    NVIC->IP[10] = 0x40;
 
     // enable interrupt 10 in NVIC
     NVIC->ISER[0] = 0x00000400;

@@ -61,7 +61,7 @@ void PWM_Init34(uint16_t period, uint16_t duty_right, uint16_t duty_left){
     // Initialize P2.7 and P2.6 - EN PWML/PWMR - 0b1100 0000 -> 0xC0
 
 
-    P2->SEL0 &= ~0xC0;
+    P2->SEL0 |= 0xC0;
     P2->SEL1 &= ~0xC0;
     P2->DIR |= 0xC0;
     TIMER_A0->CCTL[0] =	0x0080;		// CCI0 toggle

@@ -61,22 +61,32 @@ void BumpInt_Init(void(*task)(uint8_t)){
 
     // write this as part of Lab 14
 	BumpTask = task;
-	// 1. Configure P4.7-P4.5, P4.3, P4.2, and P4.0 as GPIO
+	// 1. Configure P4.7-P4.5, P4.3, P4.2, and P4.0 as GPIO -> 0b 1110 1101 = 0xED
+	P4->SEL0 &= ~0xED;
+	P4->SEL1 &= ~0xED;
 
 	// 2. Make P4.7-P4.5, P4.3, P4.2, and P4.0 input
+	P4->DIR &= ~0xED;
 
 	// 3. Enable pull-up resistors on P4.7-P4.5, P4.3, P4.2, and P4.0
+	P4->REN |= 0xED;
+	P4->OUT |= 0xED;
 
 	// 4. P4.7-P4.5, P4.3, P4.2, and P4.0 are falling edge event
 	//    Set to falling edge events PxIFG flag is set with a high-to-low transition
+	P4->IES |= 0xED;
 
 	// 5. Clear all flags (IFG -> no interrupts pending)
+	P4->IFG &= ~0xED;
 
     // 6. Enable interrupt on P4.7-P4.5, P4.3, P4.2, and P4.0 (enable IE)
+	P4->IE |= 0xED;
 
 	// 7. Setup the Nested Vector Interrupt Controller with priority 1
 	//    Ensure you choose the correct NVIC
     //    Enable IRQ 38 in NVIC
+	NVIC->IP[38] = 1 << 5;
+	NVIC->ISER[1] = 1 << 6;
 
 }
 
@@ -90,11 +100,18 @@ void BumpInt_Init(void(*task)(uint8_t)){
 // bit 1 Bump2
 // bit 0 Bump1
 uint8_t BumpInt_Read(void){
-
-    // 1. Read the sensors (which are active low) and convert to active high
+    // write this as part of Lab 8
+    // 1)read the sensors (which are active low) and convert to active high
+    uint8_t pinRead = ~P4->IN;
 
     // 2. Select, shift, combine, and output
-    return 0; // replace this line
+    uint8_t output = 0x00;
+
+    output |= ((pinRead & 0xE0) >> 2);
+    output |= ((pinRead & 0x0C) >> 1);
+    output |= (pinRead & 0x01);
+
+    return output;
 }
 
 
@@ -103,7 +120,27 @@ uint8_t BumpInt_Read(void){
 void PORT4_IRQHandler(void){
     // write this as part of Lab 14
 
-    // clear interrupt flags (No interrupt is pending)
+    // clear interrupt flags (No interrupt is pending) -> 0b 1110 1101
+//    if(P4->IFG & 0x80){
+//        P4->IFG &= ~0x80;
+//    }
+//    if(P4->IFG & 0x40){
+//        P4->IFG &= 0x40;
+//    }
+//    if(P4->IFG & 0x20){
+//        P4->IFG &= ~0x20;
+//    }
+//    if(P4->IFG & 0x08){
+//        P4->IFG &= 0x08;
+//    }
+//    if(P4->IFG & 0x04){
+//        P4->IFG &= 0x04;
+//    }
+//    if(P4->IFG & 0x01){
+//        P4->IFG &= 0x01;
+//    }
+
+    P4->IFG &= ~0xED;
 
     // Call the user function with the value returned by BumpInt_Read()
     (*BumpTask)(BumpInt_Read());

@@ -53,10 +53,10 @@ policies, either expressed or implied, of the FreeBSD Project.
 #define MAX_DIST            800         // Max distance in mm.
 
 // Update the following coefficients for Lab 15
-#define ADCMAX_LEFT			0	// Maximum IR ADC value
-#define IRSLOPE_LEFT 		0	// Calibration coefficient, m
-#define IROFFSET_LEFT 		0	// Calibration coefficient, c
-#define DIST_OFFSET_LEFT 	0	// Distance from common spot on robot to IR sensor
+#define ADCMAX_LEFT			2061	// Maximum IR ADC value
+#define IRSLOPE_LEFT 		1118247	// Calibration coefficient, m
+#define IROFFSET_LEFT 		500	// Calibration coefficient, c
+#define DIST_OFFSET_LEFT 	80	// Distance from common spot on robot to IR sensor in mm
 
 // LeftConvert
 // Calculate the distance in mm given the 14-bit ADC value
@@ -68,17 +68,23 @@ policies, either expressed or implied, of the FreeBSD Project.
 // Output: Distance in mm
 uint16_t LeftConvert(uint32_t adc_value){        // returns left distance in mm
     // write this for Lab 15
-    return 0; // replace this line
-
+    if(adc_value < ADCMAX_LEFT){
+        return MAX_DIST;
+    }
+    else{
+        uint16_t dist = IRSLOPE_LEFT / (adc_value - IROFFSET_LEFT);
+        dist = dist + DIST_OFFSET_LEFT;
+        return dist;
+    }
 }
 
 
 // Update the following coefficients for Lab 15
 // Ensure ADCMAX must be greater than IROFFSET
-#define ADCMAX_CENTER         0   // Maximum IR ADC value
-#define IRSLOPE_CENTER        0   // Calibration coefficient, m
-#define IROFFSET_CENTER       0   // Calibration coefficient, c
-#define DIST_OFFSET_CENTER    0   // Distance from common spot on robot to IR sensor.
+#define ADCMAX_CENTER         2243   // Maximum IR ADC value
+#define IRSLOPE_CENTER        1037874   // Calibration coefficient, m
+#define IROFFSET_CENTER       837   // Calibration coefficient, c
+#define DIST_OFFSET_CENTER    80   // Distance from common spot on robot to IR sensor.
 
 // CenterConvert
 // Calculate the distance in mm given the 14-bit ADC value
@@ -90,16 +96,23 @@ uint16_t LeftConvert(uint32_t adc_value){        // returns left distance in mm
 // Output: Distance in mm
 uint16_t CenterConvert(uint32_t adc_value){   // returns center distance in mm
     // write this for Lab 15
-    return 0; // replace this line
+    if(adc_value < ADCMAX_CENTER){
+        return MAX_DIST;
+    }
+    else{
+        uint16_t dist = IRSLOPE_CENTER / (adc_value - IROFFSET_CENTER);
+        dist = dist + DIST_OFFSET_CENTER;
+        return dist;
+    }
 }
 
 
 // Update the following coefficients for Lab 15
 // Ensure ADCMAX must be greater than IROFFSET
-#define ADCMAX_RIGHT        0     // Maximum IR ADC value
-#define IRSLOPE_RIGHT       0     // Calibration coefficient, m
-#define IROFFSET_RIGHT      0     // Calibration coefficient, c
-#define DIST_OFFSET_RIGHT   0     // Distance from common spot on robot to IR sensor.
+#define ADCMAX_RIGHT        2039     // Maximum IR ADC value
+#define IRSLOPE_RIGHT       1108067     // Calibration coefficient, m
+#define IROFFSET_RIGHT      626     // Calibration coefficient, c
+#define DIST_OFFSET_RIGHT   80     // Distance from common spot on robot to IR sensor.
 
 // RightConvert
 // Calculate the distance in mm given the 14-bit ADC value
@@ -111,5 +124,12 @@ uint16_t CenterConvert(uint32_t adc_value){   // returns center distance in mm
 // Output: Distance in mm
 uint16_t RightConvert(uint32_t adc_value){      // returns right distance in mm
     // write this for Lab 15
-    return 0; // replace this line
+    if(adc_value < ADCMAX_RIGHT){
+        return MAX_DIST;
+    }
+    else{
+        uint16_t dist = IRSLOPE_RIGHT / (adc_value - IROFFSET_RIGHT);
+        dist = dist + DIST_OFFSET_RIGHT;
+        return dist;
+    }
 }

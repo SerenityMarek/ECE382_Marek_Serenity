@@ -69,7 +69,7 @@ void LCDClear1(void){
 
     // Contrast value 0xB1 looks good on red SparkFun
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB1;
+    uint8_t const contrast = 0xA9;
     Nokia5110_SetContrast(contrast);
 
     Nokia5110_Clear();      // erase entire display
@@ -169,10 +169,14 @@ void LCDOut2(void) {
     // At row 3 and col 6
     // Display the bump data in hex
     // Write your code here.
+    Nokia5110_SetCursor2(3, 6);
+    Nokia5110_OutU8Hex(BumpData);
 
     // At row 4 col 6
     // Display the number of collisions in decimal with a fixed length of 5.
     // Write your code here.
+    Nokia5110_SetCursor2(4, 6);
+    Nokia5110_OutUDec(NumCollisions, 5);
 
 }
 
@@ -298,8 +302,8 @@ void Program14_3(void) {
     }
 }
 
-int main(void){
-    Program14_1();
-    //Program14_2();
+     int main(void){
+    //Program14_1();
+    Program14_2();
     //Program14_3();
 }

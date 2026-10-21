@@ -1,4 +1,4 @@
-// Motor.c
+ // Motor.c
 // Runs on MSP432
 // Provide mid-level functions that initialize ports and
 // set motor speeds to move the robot. Lab 13 solution
@@ -103,7 +103,7 @@ void Motor_Coast(void){
     // write this as part of Lab 13
     // Note: setting nSleep = 0 and PWM (EN) = 0 makes the robot "coast"
     P3 -> OUT &= ~0xC0;
-    P2 -> OUT &= ~0xC0;
+    //P2 -> OUT &= ~0xC0;
 
     // Update left PWM to 0
     PWM_DutyLeft(0);
@@ -122,7 +122,7 @@ void Motor_Brake(void){
     // write this as part of Lab 13
     // Note: setting nSleep = 1 and PWM (EN) = 0 makes the robot "brake"
     P3 -> OUT |= 0xC0;
-    P2 -> OUT &= ~0xC0;
+    //P2 -> OUT &= ~0xC0;
 
     // Update left PWM to stop motor
     PWM_DutyLeft(0);
@@ -167,7 +167,7 @@ void Motor_Forward(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
     // set direction of motors
     P3 -> OUT |= 0xC0;  // nSleep = 1
     P5 -> OUT &= ~0x30; // PH = 0
-    P2 -> OUT |= 0xC0;  // EN = 1
+    //P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
     PWM_DutyLeft(leftDuty_permil);
@@ -193,7 +193,7 @@ void Motor_TurnRight(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
     P3 -> OUT |= 0xC0;  // nSleep = 1
     P5 -> OUT &= ~0x10; // PH4 = 0
     P5 -> OUT |= 0x20;  //PH5 = 1
-    P2 -> OUT |= 0xC0;  // EN = 1
+    //P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
     PWM_DutyLeft(leftDuty_permil);
@@ -219,7 +219,7 @@ void Motor_TurnLeft(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
     P3 -> OUT |= 0xC0;  // nSleep = 1
     P5 -> OUT |= 0x10;  // PH4 = 1
     P5 -> OUT &= ~0x20; //PH5 = 0
-    P2 -> OUT |= 0xC0;  // EN = 1
+    //P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
     PWM_DutyLeft(leftDuty_permil);
@@ -246,7 +246,7 @@ void Motor_Backward(uint16_t leftDuty_permil, uint16_t rightDuty_permil){
     // set direction of motors
     P3 -> OUT |= 0xC0;  // nSleep = 1
     P5 -> OUT |= 0x30; // PH = 1
-    P2 -> OUT |= 0xC0;  // EN = 1
+    //` P2 -> OUT |= 0xC0;  // EN = 1
 
     // update PWMs
     PWM_DutyLeft(leftDuty_permil);
