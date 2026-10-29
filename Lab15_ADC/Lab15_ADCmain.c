@@ -263,7 +263,7 @@ void LCDClear4(void){
 
     // Contrast value 0xB1 looks good on red SparkFun
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB9;
+    uint8_t const contrast = 0xA9;
     Nokia5110_SetContrast(contrast);
 
     Nokia5110_Clear(); // erase entire display
