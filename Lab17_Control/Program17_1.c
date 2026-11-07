@@ -91,11 +91,11 @@ policies, either expressed or implied, of the FreeBSD Project.
 // static uint32_t Kp = 1;  // This corresponds to an actual Kp of 0.001 due to division by GainDivider.
 // static uint32_t Kp = 91; // Here, Kp is effectively 0.091 (91/1000).
 
-static int32_t Kp = 0;  // Proportional gain, scaled by GAIN_DIVIDER
-static int32_t Ki = 0;  // Integral gain, scaled by GAIN_DIVIDER
+static int32_t Kp = 1000; //3400; //1100;  // Proportional gain, scaled by GAIN_DIVIDER
+static int32_t Ki = 150; //200; //500;  // Integral gain, scaled by GAIN_DIVIDER
 
 // Target speed for the motors, in revolutions per minute (rpm)
-static uint16_t DesiredSpeed_rpm = 80;    // 80 rpm
+static uint16_t DesiredSpeed_rpm = 50;    // 80 rpm
 
 // =============== IMPORTANT NOTE =====================================
 // Use the 'static' storage class specifier to restrict the scope to this file.
@@ -134,7 +134,7 @@ static void LCDClear(void){
 
     // Contrast value 0xB1 looks good on red SparkFun.
     // Adjust this from 0xA0 (lighter) to 0xCF (darker) if necessary.
-    uint8_t const contrast = 0xB1;
+    uint8_t const contrast = 0xB9;
     Nokia5110_SetContrast(contrast);
 
     Nokia5110_Clear();  // erase entire display
@@ -385,34 +385,36 @@ static void Controller(void){
     // ====================================================================
 
     // Obtain tachometer data and store in arrays.
-    Tachometer_GetSpeeds(0, 0);
+    Tachometer_GetSpeeds(&LeftTachoPeriod[idxTachoData], &RightTachoPeriod[idxTachoData]);
     // Update index in circular buffer.
+    idxTachoData = (idxTachoData + 1) % TACHBUFF_SIZE;
 
     // Step 1: Calculate average tachometer period over last ten values.
-    uint16_t leftPeriod = 0;
-    uint16_t rightPeriod = 0;
+    uint16_t leftPeriod = average(LeftTachoPeriod, TACHBUFF_SIZE);
+    uint16_t rightPeriod = average(RightTachoPeriod, TACHBUFF_SIZE);
+
 
     // Step 2: Calculate actual motor speed (RPM) using tachometer data.
-    LeftSpeed_rpm = 0;
-    RightSpeed_rpm = 0;
+    LeftSpeed_rpm = PULSE2RPM / leftPeriod;
+    RightSpeed_rpm = PULSE2RPM / rightPeriod;
 
     // Step 3: Calculate speed errors by comparing to desired speed.
-    ErrorL = 0;
-    ErrorR = 0;
+    ErrorL = DesiredSpeed_rpm - LeftSpeed_rpm;
+    ErrorR = DesiredSpeed_rpm - RightSpeed_rpm;
 
     // Step 4: Accumulate errors for integral control.
-    AccumSpeedErrorL = 0;
-    AccumSpeedErrorR = 0;
+    AccumSpeedErrorL += ErrorL;
+    AccumSpeedErrorR += ErrorR;
 
     // Step 5: Calculate control outputs (duty cycles) using PI control formula.
-    LeftDuty_permil = 0;
-    RightDuty_permil = 0;
+    LeftDuty_permil = (Kp*ErrorL + Ki*AccumSpeedErrorL) / GAIN_DIVIDER;
+    RightDuty_permil = (Kp*ErrorR + Ki*AccumSpeedErrorR) / GAIN_DIVIDER;
 
     // Step 6: Ensure duty cycles are within predefined bounds, MINMAX.
-    LeftDuty_permil = 0;
-    RightDuty_permil = 0;
+    LeftDuty_permil = MINMAX(PWMMIN, PWMMAX, LeftDuty_permil);
+    RightDuty_permil = MINMAX(PWMMIN, PWMMAX, RightDuty_permil);
 
-	
+
     // ====================================================================
     // Do not modify anything below this line
     // ====================================================================
